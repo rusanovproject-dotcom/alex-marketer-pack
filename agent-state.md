@@ -13,6 +13,7 @@ onboarding_completed: false    # true после /alex-onboarding
 onboarding_date: null          # YYYY-MM-DD когда прошёл онбординг
 focus_direction: null          # выбранное направление работы (одной фразой клиента)
 project_created_at: null       # YYYY-MM-DD HH:MM когда создали папку projects/<slug>/
+stage_1_critic_passed: false   # true когда /jtbd-critic пройден (закрытие Stage 1)
 ---
 
 # Alex Marketer — Global State
