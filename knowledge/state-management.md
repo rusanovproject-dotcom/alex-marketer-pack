@@ -1,103 +1,89 @@
-# State management — Resume-pattern для длинных пайплайнов
+# State management — Resume-pattern для JTBD-распаковки
 
-Полный пайплайн `/audience-stage` = 6-7 сессий по 1.5-2ч. Один контекст не вытянет 7000+ строк диалога — модель деградирует. Resume-pattern разбивает работу на сессии с явной точкой восстановления.
-
-Краткая сводка в `audience-stage/SKILL.md`. Полный протокол — здесь.
+JTBD-распаковка = `/jtbd` 13 шагов × 3-5 сегментов = много диалога. Один контекст не вытянет всё разом — модель деградирует. Resume-pattern разбивает работу на сессии с явной точкой восстановления.
 
 ---
 
-## Структура сессий полной распаковки
+## Структура сессий
 
 | Сессия | Что делается | Время | Output |
 |--------|--------------|-------|--------|
-| **1A — Discover** | Шаги 1-3 + двойное интервью + money-map + hypotheses + Discovery → ТОП-3 | ~2ч | `NORTH-STAR.md` + `_state/pipeline-progress.md` |
-| **1B-N — Unpack #N** | `/segments-unpack {slug}` для N-го сегмента (N = 1..3) | ~2ч | `segment-portrait.md` секции 0,1,2,5,6 |
-| **1C-N — Awareness #N** | `/segments-awareness {slug}` для каждого | ~1.5ч × N | секции 3,4,7,8 + `segment-core.md` |
+| **A — Discover** | Step 00 (диагностика) → 01a (factbase) → 01b (кластеризация сегментов) | ~1.5-2ч | Список 3-5 сегментов в `JTBD_анализ_<main>.md` |
+| **B-N — Segment N** | Steps 02a → 10 для N-го сегмента (Big Job → jobStory → Точки А/Б → граф работ → Consideration Set → барьеры → Entry/Monetization → оценка) | ~2-2.5ч | Заполненный блок сегмента в `JTBD_анализ_<main>.md` |
+| **C — Финал** | Step 11 (ранжирование) → 12 (механики ценности) → 13 (стратегические гипотезы) | ~1.5ч | Финальный документ |
+| **D — Критик** | `/jtbd-critic` в **новом чате**, чистый контекст | ~30-60 мин | Правки БЫЛО / ПРЕДЛАГАЮ / ПРИЧИНА |
 
-⚠️ N не строго 3 — клиент может проработать 1-2 сегмента и закрыть Stage 1 (3-й в backlog).
+⚠️ N не строго 3-5 — клиент может проработать 1-2 сегмента и закрыть Stage 1, остальные в backlog.
 
 ---
 
 ## State-файл — точка восстановления
 
-**Локальный pipeline-state:** `projects/<main>-audience/_state/pipeline-progress.md`
 **Глобальный agent-state:** `office/agents/alex-marketer/agent-state.md`
 
-Связь: agent-state.md (что я делаю сейчас) ссылается на pipeline-progress.md (где в pipeline).
+Это единственный state-файл — всё что нужно для resume там. Без локального pipeline-progress (он избыточен — JTBD пишет прогресс прямо в `JTBD_анализ_<main>.md`).
 
-### Формат `pipeline-progress.md`
+### Формат `agent-state.md` (10 полей YAML)
 
-```markdown
-# Pipeline Progress — Stage 1 Audience
-
-**Started:** YYYY-MM-DD HH:MM
-**Last update:** YYYY-MM-DD HH:MM
-**Current session:** 1A | 1B-1 | 1B-2 | 1B-3 | 1C-1 | 1C-2 | 1C-3 | DONE
-**Mode:** established | early-stage | greenfield
-
-## Completed steps
-- [x] 1A — discover ТОП-3 (NORTH-STAR.md заполнен)
-- [ ] 1B-1 — unpack hot-сегмента
-- [ ] ...
-
-## Active state (для resume)
-- Hot slug: {h-slug}
-- Warm slug: {w-slug}
-- Cold slug: {c-slug}
-- Last completed: {что закончили}
-- Next action: {что делать в следующей сессии}
-
-## Context для следующей сессии
-- Какие файлы прочитать первым делом
-- Ключевые находки (3-5 буллетов)
-- Открытые вопросы
+```yaml
+---
+active_client: <имя клиента>          # кто владелец офиса
+active_project: <slug>                 # папка projects/<slug>/
+active_skill: /jtbd                    # текущий скилл (или null)
+active_stage: 1                        # 1 (Audience-JTBD) | 2 | 3
+active_step: 02a-extract-classify      # текущий Step внутри /jtbd
+active_segment: <segment-slug>         # если в фазе углубления одного сегмента (B-N)
+last_checkpoint: 2026-04-28 22:30      # когда последний раз обновили
+interrupted: false                     # true если прервали посреди сессии
+interrupted_reason: null               # описание если interrupted: true
+resume_hint: null                      # что делать в следующей сессии если interrupted
+onboarding_completed: true             # пройден ли /alex-onboarding
+focus_direction: "основной продукт"   # выбранное направление
+project_created_at: 2026-04-28 21:00   # когда создали papke projects/<slug>/
+---
 ```
+
+**Правило interrupted:** при ЛЮБОМ прерывании (клиент ушёл в другую тему / сессия закончилась / клиент сорвал в Stage 2-3) — Алекс **обязан** перед ответом на новую тему записать `interrupted: true` + причину + resume_hint. Иначе следующая сессия не сможет вернуться правильно.
 
 ---
 
-## Алгоритм при старте `/audience-stage`
+## Алгоритм при старте `/jtbd`
 
 ```
 Pre-flight Шаг 0 — Resume Check:
-  if [ -f "projects/<main>-audience/_state/pipeline-progress.md" ]; then
-    # Сессия в процессе — НЕ запускать заново
-    cat _state/pipeline-progress.md
-    Сказать клиенту:
-      «Stage 1 уже в процессе. Текущая сессия: {1B-2 — unpack warm}.
-       Last completed: {hot-сегмент распакован}.
-       Next action: {запустить /segments-unpack {warm-slug}}.
+  cat office/agents/alex-marketer/agent-state.md
 
-       (a) Продолжить с этого места — Stop+wait
-       (b) Начать заново (старая папка → _archive/) — Stop+wait
-       (c) Завершить разбор досрочно — отметить DONE»
-  else
-    # Свежий старт — Шаг 1 (создать папку)
-    создать pipeline-progress.md в Шаге 1
-  fi
+  if active_skill == "/jtbd" and active_step != null:
+    # Сессия в процессе
+    Сказать клиенту:
+      «Распаковка уже в процессе. Текущий шаг: {active_step}
+       (сегмент: {active_segment}).
+       Last checkpoint: {last_checkpoint}.
+
+       (a) Продолжить с этого шага — Stop+wait
+       (b) Начать заново (старый JTBD_анализ_<main>.md → _archive/) — Stop+wait
+       (c) Закрыть досрочно — записать что есть как Stage 1»
+  else:
+    # Свежий старт — Step 00
+    обновить agent-state.md: active_skill: /jtbd, active_step: 00-entry-and-diagnostics
 ```
 
 ---
 
 ## Обновление state в каждой сессии
 
-После каждого Шага — Алекс **обязан** обновить:
+После каждого Step — Алекс **обязан** обновить `agent-state.md`:
 
-**`pipeline-progress.md`:**
-- Отметить шаг как `[x]` completed
-- Обновить `Last update` timestamp
-- Записать `Last completed` и `Next action`
-- 3-5 ключевых находок в «Context для следующей сессии»
-
-**`agent-state.md`** (глобальный):
-- `active_step: <текущий>`
-- `last_checkpoint: <date>`
+- `active_step` ← следующий ожидаемый шаг
+- `last_checkpoint` ← timestamp now
+- `active_segment` ← если перешли на конкретный сегмент в фазе B
 - `interrupted: false` (если всё ок) или `true` + `resume_hint` (если прервали)
 
 ---
 
-## Кэширование артефактов в файлы — НЕ в контекст
+## Кэширование артефактов в файлы — не в контекст
 
-Сейчас цитаты живут в диалоге → попадают в context window. **Закон:** после каждого блока интервью — сразу записывать в `segment-portrait.md` или `voice-of-customer.md`, а в чате держать только `📌 записано (43 цитаты)`.
+Цитаты живут в диалоге → попадают в context window. **Закон:** после каждого блока интервью — сразу записывать в `JTBD_анализ_<main>.md` (соответствующая секция сегмента), а в чате держать только короткое подтверждение `📌 записано (N цитат)`.
 
 Один токен в чате вместо тысячи. Освобождает контекст для следующих шагов.
 
@@ -107,7 +93,7 @@ Pre-flight Шаг 0 — Resume Check:
 
 После 3 stop+wait подряд или 90 минут диалога — Алекс пишет:
 
-> *«Накопилось N цитат, M гипотез, J решений. Контекст забивается — давай сохраним прогресс и продолжим новой сессией с `/audience-stage --resume`. Нажми `/clear` когда готов.»*
+> *«Накопилось N цитат, M гипотез, J решений. Контекст забивается — давай сохраним прогресс и продолжим новой сессией. Нажми `/clear` когда готов — в новом чате прочитаю agent-state.md и продолжим с {next_step}.»*
 
 Это safeguard от деградации.
 
@@ -115,16 +101,17 @@ Pre-flight Шаг 0 — Resume Check:
 
 ## Anti-patterns
 
-- ❌ Делать всю распаковку (4-6 часов) одной сессией без `/clear`
-- ❌ Держать цитаты в контексте чата вместо записи в файл
-- ❌ Не обновлять `pipeline-progress.md` после каждого Шага
-- ❌ Забыть про resume check в Pre-flight Шаг 0
-- ❌ Не синхронизировать локальный pipeline-progress с глобальным agent-state
+- ❌ Делать всю распаковку (8-12 часов) одной сессией без `/clear`
+- ❌ Держать цитаты в контексте чата вместо записи в `JTBD_анализ_<main>.md`
+- ❌ Не обновлять `agent-state.md` после каждого Step
+- ❌ При прерывании не записать `interrupted: true` + `resume_hint`
+- ❌ Не делать resume check в Pre-flight Шаг 0 при перезапуске `/jtbd`
 
 ---
 
-## Связь со скиллами `/audience-resume`, `/audience-status`, `/audience-check`
+## Связь со скиллами Алекса
 
-- `/audience-status` — read-only, читает оба state-файла, возвращает где мы по плану vs реальности
-- `/audience-check` — auto-call каждые 5 ходов, проверяет на drift, обновляет agent-state.md
-- `/audience-resume` — после `/clear`, поднимает контекст из pipeline-progress.md, запускает нужный скилл с `--resume`
+- `/alex-onboarding` — пишет в agent-state.md `onboarding_completed: true` + `focus_direction` + `active_project`
+- `/jtbd` — обновляет `active_step` после каждого Step, читает agent-state.md в Pre-flight Шаг 0 (resume check)
+- `/jtbd-critic` — запускается в **новом чате**, читает `JTBD_анализ_<main>.md` готовый, agent-state.md не трогает (свежий контекст для свежего взгляда)
+- `/marketer-log-deal` — пишет в `customers/` (если активирован модуль встреч), agent-state.md не трогает

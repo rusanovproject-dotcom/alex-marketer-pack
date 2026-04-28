@@ -20,12 +20,11 @@
 
 | Файл | Кто пишет | Откуда обновления |
 |------|-----------|-------------------|
-| `audience/NORTH-STAR.md` | владелец | из validated [ICP] H |
-| `audience/segments/{slug}/segment-core.md` | владелец (с твоей помощью через `/segments-unpack`) | из validated [SEGMENT] H |
-| `product/core-offer.md` | владелец | из validated [PRODUCT/OFFER] H |
-| `product/ladder.md` | владелец | из validated [PRICE] H |
-| `brand/positioning.md` | владелец | из validated [POSITIONING] H |
-| `funnel/channels.md, welcome.md, scripts.md` | владелец (с твоей помощью через `/funnel-build`) | из validated [CHANNEL/LM/FUNNEL] H |
+| `JTBD_анализ_<main>.md` | владелец (с твоей помощью через `/jtbd`) — секции сегментов | из validated [SEGMENT/JOB] H |
+| `product/core-offer.md` | владелец | из validated [PRODUCT/OFFER] H *(Stage 2 — не подключён в этом паке)* |
+| `product/ladder.md` | владелец | из validated [PRICE] H *(Stage 2)* |
+| `brand/positioning.md` | владелец | из validated [POSITIONING] H *(Stage 4)* |
+| `funnel/channels.md, welcome.md, scripts.md` | владелец | из validated [CHANNEL/LM/FUNNEL] H *(Stage 3)* |
 
 ---
 
