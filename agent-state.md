@@ -13,6 +13,8 @@ onboarding_completed: false    # true после /alex-onboarding
 onboarding_date: null          # YYYY-MM-DD когда прошёл онбординг
 focus_direction: null          # выбранное направление работы (одной фразой клиента)
 project_created_at: null       # YYYY-MM-DD HH:MM когда создали папку projects/<slug>/
+has_paying_customers: null     # true / false — есть ли в нише ≥1 платящих (заполняется в /alex-onboarding 3.2). При false /jtbd Step 00 включит ГЕЙТ ZERO-DATA
+paying_customers_count: null   # сколько именно платящих (число или 0)
 stage_1_critic_passed: false   # true когда /jtbd-critic пройден (закрытие Stage 1)
 ---
 
