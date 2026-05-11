@@ -1,0 +1,121 @@
+# alex-marketer-pack — manifest
+# Описывает что в паке, зависимости, и какие файлы НЕ перезаписывать при апдейте.
+# Парсится bash-скриптами через grep+sed. Не требует yq/python/jq.
+
+pack_name: alex-marketer-pack
+version: 2.1.0
+agent_slug: alex-marketer
+description: Алекс Маркетолог — навигатор продуктовой упаковки. JTBD + Core Offer + CustDev.
+repo: https://github.com/rusanovproject-dotcom/alex-marketer-pack
+
+# --- LOCAL SKILLS ---
+# Скиллы внутри skills/<name>/SKILL.md
+local_skills:
+  - name: alex-onboarding
+    description: Точка входа Алекса в проект, короткий онбординг
+  - name: jtbd
+    description: JTBD-распаковка ЦА с гейтом zero-data
+  - name: jtbd-critic
+    description: Свежий взгляд на JTBD-анализ в новом чате
+  - name: core-offer
+    description: Упаковка центральной фразы продукта (v0.2, Stage 0-7)
+    version: 0.2
+  - name: marketer-log-deal
+    description: Запись клиентской встречи в базу проекта
+
+# --- GLOBAL SKILLS ---
+# Скиллы в .claude/skills/<name>/ — копируются в .claude/skills/ ученика
+# Доступны как slash-команды во всём workspace, не только у Алекса
+global_skills:
+  - name: custdev
+    required: true
+    reason: "Обязательный путь при has_paying_customers: false (Step 8.5 в jtbd)"
+  # marketer-enable-meetings — упомянут в core.md/install.md/README,
+  # физически не реализован нигде. Записан в failures.md как known-gap.
+  # При следующей версии либо реализуем, либо вычищаем упоминания.
+
+# --- KNOWLEDGE ---
+knowledge:
+  - knowledge/jtbd/
+  - knowledge/file-ownership.md
+  - knowledge/hypothesis-system.md
+  - knowledge/voice.md
+  - knowledge/state-management.md
+
+# --- EXTENSIONS ---
+extensions:
+  - extensions/sales-meetings/
+
+# --- TEMPLATES ---
+templates:
+  - templates/
+
+# --- PRESERVED USER FILES ---
+# Эти файлы НЕ перезаписываются при апдейте — клиентские данные ученика.
+preserved_user_files:
+  - overrides.md
+  - agent-state.md
+  - memory.md
+  - failures.md
+  - projects/
+  - customers/
+  - inbox/
+
+# --- IGNORE LIST FOR verify-pack ---
+# Технические команды Claude Code и handoff-ссылки на внешние скиллы (вне alex-pack).
+# Их физического наличия в этом паке не требуется — они либо системные, либо живут
+# в отдельных паках клиента.
+verify_ignore:
+  - accept
+  - clear
+  - compact
+  - rewind
+  - context
+  - help
+  - schedule
+  # --- внешние скиллы маркетинговой команды (отдельные паки или системные) ---
+  - marketer-funnel       # пак funnel/lestnitsa, отдельно от alex
+  - marketer-ladder       # пак продуктовой лестницы, отдельно от alex
+  - marketer-revision     # пак ревизии маркетинга, отдельно
+  - marketer-checkin      # пак еженедельного ревью, отдельно
+  # --- мета-скиллы офиса (системные, не в alex-pack) ---
+  - new-project           # мета-команда инициализации проекта
+  - unpack-project        # мета-команда распаковки от Стратега
+  - install-agent         # команда установки агента
+  # --- placeholder в документации, не реальная команда ---
+  - skill-name
+
+# --- KNOWN GAPS ---
+# Скиллы упомянуты в *.md, но физически отсутствуют — документированные дыры.
+# При verify-pack.sh они выдают WARNING, не FAIL.
+# В следующей версии — либо реализуем, либо вычищаем упоминания.
+known_gaps:
+  - name: marketer-enable-meetings
+    mentioned_in:
+      - core.md
+      - install.md
+      - extensions/sales-meetings/CUSTOMER-INTELLIGENCE.md
+      - README.md
+    status: "planned, not implemented"
+    workaround: "Модуль Customer Intelligence пока без активатора. Ручная активация — добавь customers/ в проект."
+  - name: marketer-disable-meetings
+    mentioned_in:
+      - extensions/sales-meetings/install.md
+    status: "planned, not implemented (парный к enable)"
+    workaround: "Деактивация — руками удали customers/ из проекта."
+  - name: parse-meeting
+    mentioned_in:
+      - extensions/sales-meetings/install.md
+      - extensions/sales-meetings/README.md
+    status: "planned, not implemented"
+    workaround: "Ручной парсинг встреч через /marketer-log-deal."
+  - name: audience-internet-research
+    mentioned_in:
+      - README.md
+    status: "planned, not implemented"
+    workaround: "Интернет-разведка делается через /custdev в фазе market_intelligence."
+  - name: audience-stage
+    mentioned_in:
+      - README.md
+    status: "planned, not implemented"
+    workaround: "Stage-маркеры аудитории — в agent-state.md руками."

@@ -8,8 +8,16 @@
 
 **JTBD не оптимален** для импульсных и неосознанных покупок (еда, одежда, FMCG) — там работает классический подход с эмоцией и атрибутами. Для всего остального — JTBD точнее.
 
-**Версия:** v2.0 (JTBD)
-**Что нового vs v1.x:** переход с audience-pipeline (Internet-First) на JTBD (13 шагов на сегмент × 1-5 сегментов), новый скилл-критик `/jtbd-critic` (свежий взгляд в новом чате), Шаг 5.5 в онбординге — Алекс сам создаёт папку проекта.
+**Версия:** v2.1 (JTBD + Core Offer + CustDev)
+**Что нового в v2.1:**
+- 🔴 **Фикс зависимостей** — добавлен `/custdev` (был упомянут как обязательный, но физически отсутствовал)
+- 🆕 **`/core-offer` v0.2** — упаковка центральной фразы продукта в трёх формах (Stage 0-7)
+- 🆕 **Система апдейтов** — `manifest.yaml` + `scripts/update-pack.sh` для обновления одной командой
+- 🆕 **Verify перед публикацией** — `scripts/verify-pack.sh` ловит битые ссылки на скиллы
+
+**Что было в v2.0:** переход с audience-pipeline (Internet-First) на JTBD (13 шагов на сегмент × 1-5 сегментов), скилл-критик `/jtbd-critic` (свежий взгляд в новом чате).
+
+📚 Полный лог изменений → [CHANGELOG.md](CHANGELOG.md). Архитектура v2.1 → [SPEC-v2.1.md](SPEC-v2.1.md).
 
 ---
 
@@ -17,6 +25,8 @@
 
 ```
 alex-marketer/
+├── manifest.yaml        ← 🆕 декларация зависимостей (что в паке, версия)
+├── CHANGELOG.md         ← 🆕 история версий
 ├── core.md              ← главная логика (читается при каждой сессии)
 ├── soul.md              ← характер
 ├── CLAUDE.md            ← layered-include точка
@@ -24,6 +34,14 @@ alex-marketer/
 ├── memory.md            ← пустой шаблон (Алекс наполнит сам)
 ├── failures.md          ← пустой шаблон
 ├── overrides.md         ← пустой (для твоих кастомных правил поверх)
+│
+├── scripts/             ← 🆕 утилиты пака
+│   ├── verify-pack.sh   ← проверка целостности (для мейнтейнера, перед публикацией)
+│   └── update-pack.sh   ← обновление пака у ученика
+│
+├── .claude/
+│   └── skills/          ← 🆕 глобальные slash-команды для всего workspace
+│       └── custdev/     ← синтетический CustDev (обязательный путь при 0 платящих)
 │
 ├── knowledge/           ← база знаний
 │   ├── voice.md         ← как говорить с клиентом
@@ -40,10 +58,11 @@ alex-marketer/
 │       ├── jtbd-extras.md
 │       └── jtbd-handbook-chapters.md
 │
-├── skills/              ← 4 скилла
+├── skills/              ← 5 локальных скиллов Алекса
 │   ├── alex-onboarding/ ← точка входа, 6 тактов первого контакта
 │   ├── jtbd/            ← главный пайплайн, 13 шагов на сегмент
 │   ├── jtbd-critic/     ← критик в новом чате (5 шагов проверки)
+│   ├── core-offer/      ← 🆕 упаковка центральной фразы (Stage 0-7)
 │   └── marketer-log-deal/ ← запись клиентских встреч (опционально)
 │
 ├── extensions/
@@ -53,6 +72,28 @@ alex-marketer/
     ├── customers.template.md
     └── hypotheses.template.md
 ```
+
+---
+
+## 🔄 Обновление пака с v2.0 → v2.1
+
+Если у тебя уже установлена v2.0:
+
+```bash
+# Из корня папки где установлен alex-marketer/
+curl -fsSL https://raw.githubusercontent.com/rusanovproject-dotcom/alex-marketer-pack/main/scripts/update-pack.sh -o /tmp/update-pack.sh
+bash /tmp/update-pack.sh /path/to/your/office/agents/alex-marketer
+```
+
+Скрипт:
+- ✅ Скачает свежий пак, сравнит с твоим (по `manifest.yaml`)
+- ✅ Покажет diff — что изменится
+- ✅ Сделает бэкап старой версии в `.alex-pack-backups/`
+- ✅ Применит апдейт **сохранив твои файлы**: `overrides.md`, `agent-state.md`, `memory.md`, `failures.md`, `projects/`, `customers/`, `inbox/`
+- ✅ Скопирует `.claude/skills/custdev/` в `.claude/skills/` твоего workspace
+- ✅ Прогонит `verify-pack.sh` локально для проверки
+
+**Если ты правил `core.md` руками** — скрипт это заметит и спросит подтверждение перед перезаписью. Безопаснее — перенести правки в `overrides.md` заранее.
 
 ---
 
