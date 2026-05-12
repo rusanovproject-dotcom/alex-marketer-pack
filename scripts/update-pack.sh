@@ -110,7 +110,9 @@ rsync -a --quiet --exclude=".alex-pack-backups" "$INSTALL_TARGET/" "$BACKUP/" 2>
 echo ""
 
 # --- Сборка rsync excludes ---
-RSYNC_EXCLUDES="--exclude=.git --exclude=.alex-pack-backups --exclude=.alex-pack-baseline"
+# .claude/skills/ нужно класть НЕ внутрь пака, а в корень workspace.
+# Поэтому исключаем из основного rsync и обрабатываем отдельно ниже.
+RSYNC_EXCLUDES="--exclude=.git --exclude=.alex-pack-backups --exclude=.alex-pack-baseline --exclude=.claude"
 for p in $PRESERVED; do
   # Если файл существует у ученика — добавляем в exclude
   if [ -e "$INSTALL_TARGET/$p" ] || [ -d "$INSTALL_TARGET/$p" ]; then
@@ -118,10 +120,40 @@ for p in $PRESERVED; do
   fi
 done
 
-# --- Применяем апдейт ---
-echo "→ Применяю обновление..."
+# --- Применяем апдейт основных файлов агента ---
+echo "→ Применяю обновление основных файлов агента..."
 rsync -a $RSYNC_EXCLUDES "$TMP_DIR/pack/" "$INSTALL_TARGET/"
-echo "  ✓ Файлы обновлены"
+echo "  ✓ Файлы агента обновлены"
+
+# --- Глобальные скиллы — в корень workspace ---
+# Ищем корень workspace: подъём по дереву до первой папки которая содержит .claude/
+# или которая является корневым `office/`-родителем
+WORKSPACE_ROOT=""
+SEARCH_DIR="$INSTALL_TARGET"
+while [ "$SEARCH_DIR" != "/" ] && [ "$SEARCH_DIR" != "$HOME" ]; do
+  SEARCH_DIR="$(dirname "$SEARCH_DIR")"
+  if [ -d "$SEARCH_DIR/.claude" ] || [ -d "$SEARCH_DIR/office" ]; then
+    WORKSPACE_ROOT="$SEARCH_DIR"
+    break
+  fi
+done
+
+if [ -z "$WORKSPACE_ROOT" ]; then
+  echo "  ⚠ Корень workspace не найден (нет родительской папки с .claude/ или office/)."
+  echo "    Глобальные скиллы кладу в $INSTALL_TARGET/.claude/skills/"
+  WORKSPACE_ROOT="$INSTALL_TARGET"
+fi
+
+if [ -d "$TMP_DIR/pack/.claude/skills" ]; then
+  echo "→ Глобальные скиллы → $WORKSPACE_ROOT/.claude/skills/"
+  mkdir -p "$WORKSPACE_ROOT/.claude/skills"
+  for skill_dir in "$TMP_DIR/pack/.claude/skills/"*/; do
+    [ -d "$skill_dir" ] || continue
+    skill_name="$(basename "$skill_dir")"
+    rsync -a "$skill_dir" "$WORKSPACE_ROOT/.claude/skills/$skill_name/"
+    echo "  ✓ /$skill_name"
+  done
+fi
 
 # --- Сохраняем baseline (для следующего апдейта — сравнить правил ли ученик) ---
 mkdir -p "$INSTALL_TARGET/.alex-pack-baseline"

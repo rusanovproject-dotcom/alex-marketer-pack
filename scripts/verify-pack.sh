@@ -79,13 +79,45 @@ done
 echo ""
 
 # --- Проверка global skills ---
+# Глобальные скиллы могут жить в одном из двух мест:
+#  1. $PACK_ROOT/.claude/skills/<name>/  — внутри свежего клона репо (для публикации)
+#  2. <WORKSPACE_ROOT>/.claude/skills/<name>/ — у ученика после установки
+# WORKSPACE_ROOT находим подъёмом по дереву до первой папки с .claude/skills/ (но не самого пака)
+# или до домашней директории.
+find_global_skill() {
+  local skill="$1"
+  # 1. Свежий клон — внутри пака
+  if [ -f "$PACK_ROOT/.claude/skills/$skill/SKILL.md" ]; then
+    echo "$PACK_ROOT/.claude/skills/$skill"
+    return 0
+  fi
+  # 2. Подъём по дереву до корня workspace
+  local dir="$PACK_ROOT"
+  while [ "$dir" != "/" ] && [ "$dir" != "$HOME" ]; do
+    dir="$(dirname "$dir")"
+    if [ -f "$dir/.claude/skills/$skill/SKILL.md" ] && [ "$dir/.claude/skills" != "$PACK_ROOT/.claude/skills" ]; then
+      echo "$dir/.claude/skills/$skill"
+      return 0
+    fi
+  done
+  # 3. Глобально в $HOME (системные скиллы Claude Code)
+  if [ -f "$HOME/.claude/skills/$skill/SKILL.md" ]; then
+    echo "$HOME/.claude/skills/$skill"
+    return 0
+  fi
+  return 1
+}
+
 echo "→ Global skills (.claude/skills/<name>/):"
 GLOBAL_FAIL=0
 for skill in $GLOBAL_SKILLS; do
-  if [ -d "$PACK_ROOT/.claude/skills/$skill" ] && [ -f "$PACK_ROOT/.claude/skills/$skill/SKILL.md" ]; then
-    echo "  ✓ /$skill"
+  if FOUND_PATH=$(find_global_skill "$skill"); then
+    # Относительный путь для красоты
+    REL="${FOUND_PATH#$PACK_ROOT/}"
+    [ "$REL" = "$FOUND_PATH" ] && REL="${FOUND_PATH/#$HOME/~}"
+    echo "  ✓ /$skill ($REL)"
   else
-    echo "  ✗ /$skill — заявлен как global, но .claude/skills/$skill/SKILL.md отсутствует"
+    echo "  ✗ /$skill — заявлен как global, но не найден ни в паке, ни в workspace, ни в \$HOME"
     GLOBAL_FAIL=$((GLOBAL_FAIL + 1))
   fi
 done

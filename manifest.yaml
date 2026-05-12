@@ -3,7 +3,7 @@
 # Парсится bash-скриптами через grep+sed. Не требует yq/python/jq.
 
 pack_name: alex-marketer-pack
-version: 2.1.0
+version: 2.1.1
 agent_slug: alex-marketer
 description: Алекс Маркетолог — навигатор продуктовой упаковки. JTBD + Core Offer + CustDev.
 repo: https://github.com/rusanovproject-dotcom/alex-marketer-pack
