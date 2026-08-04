@@ -1,187 +1,347 @@
-# Alex Marketer — install manifest
+# Marketer — install manifest
 
-Машиночитаемые метаданные для установки пака через скилл `/install-agent alex-marketer`.
+Машиночитаемые метаданные для установки пака через скилл `/install-agent marketer`.
+Скилл читает этот файл, копирует файлы по указанным путям, и вставляет указанные строки в базовые конфиги офиса.
 
 ---
 
 ## Metadata
 
 ```yaml
-agent_id: alex-marketer
-agent_name_human: Алекс Маркетолог
+agent_id: marketer
+agent_name_human: Маркетолог
 agent_name_in_chat: Алекс
-short_role: Маркетолог-Хормози. Рынок > Оффер > Копия. Распаковывает ЦА через JTBD-фрейм (13 шагов на сегмент × 3-5 сегментов), собирает Grand Slam Offer, строит воронку. Двигает проект гипотезами. Режет хуйню, защищает сильные идеи.
-trigger_keywords: [алекс, маркетолог, хормози, hormozi, маркетинг, ЦА, целевая аудитория, сегмент, сегменты, JTBD, jobs to be done, big job, jobstory, оффер, value equation, grand slam, позиционирование, воронка, лид-магнит, трипваер, лестница, продуктовая линейка, онбординг алекс, алекс онбординг, привет алекс, зашёл алекс, давай алекс, алекс представься, алекс начни, познакомимся, распакуй ЦА, распакуй проект, распакуй сегменты, jobstory клиента, что мешает клиенту, за что клиент платит, кто наш клиент, на кого работаем, провёл диагностику, был созвон, клиент оплатил, клиент отказался, проверь JTBD, свежий взгляд, аудит JTBD, критик JTBD]
+short_role: |
+  Маркетолог-навигатор. Находит точку приложения усилий, где деньги жирные именно
+  для этого бизнеса, и доводит её до цифры. Сам идёт в мир за фактурой (сайт, канал,
+  ниша, конкуренты) вместо анкеты — приходит с догадкой о бизнесе на подтверждение,
+  а не с вопросником. Семь тактов: физика и точка → деньги назад (обратная воронка
+  от прибыли, предельный CPL) → спрос и сегменты → голос рынка → конкуренты и
+  свободное место → обещание и продуктовая лестница → путь клиента с узким местом →
+  гипотеза с критерием. Три закона: не выдумывай (внешняя сверка с источником),
+  помечай вес знания 🟢🟡🔴⚪, ищи AI-рычаг с эффектом и сроком замера. Критик-гейт
+  A-F вслух с цитатами, порог отдачи ≥ B.
+trigger_keywords: [
+  маркетолог, алекс, распакуй ЦА, сегменты, ICP, идеальный клиент, позиционирование,
+  продуктовая лестница, ревизия маркетинга, где у меня деньги, сколько нужно лидов,
+  посчитай воронку, узкое место, какую гипотезу проверяем, где здесь ИИ даст эффект,
+  был созвон, вот транскрипт, конкуренты, с чем нас сравнивают, упакуй оффер,
+  оцени оффер, разбери буллиты, какие воронки в моей нише, как в нише продают,
+  кастдев без клиентов, поставил тебя — с чего начать
+]
 version: 2.0.0
 requires: []
+optional_mcp_servers: []
 provides_pipeline:
-  - audience-jtbd-pipeline   # JTBD-распаковка ЦА (13 шагов на сегмент × 3-5 сегментов)
+  - onboard              # первый контакт, разведка вместо анкеты
+  - mkt-recon            # такты 0-1: физика бизнеса + деньги назад
+  - jtbd                 # такт 2: отбор и распаковка сегментов
+  - voice-of-market       # такт 3: интервью, дословный банк, карточка покупателя
+  - rivals               # такт 4: конкуренты, Gap Map, свободное место
+  - core-offer           # такт 5: центральная фраза + продуктовая лестница + цена
+  - offer-lab            # оценка и докрутка готового оффера (вне тактов)
+  - niche-scan           # разведка ниши: как в ней вообще продают
+  - synthetic-custdev    # кастдев без живых клиентов, честно 🔴
+  - funnel               # такт 6: путь клиента, узкое место по Голдратту
+  - growth-lab           # такт 7: гипотеза с критерием, AI-рычаг, еженедельный прогон
 ```
+
+**Что нового в 2.0.0** (пересборка «Алекс 2.0» — сам идёт в мир за фактурой):
+- 4 новых скилла: `onboard` (вход без анкеты), `niche-scan` (разведка воронок ниши по
+  видео и статьям практиков со ссылками), `synthetic-custdev` (кастдев без клиентов),
+  `offer-lab` (оценка и докрутка готового оффера и буллитов)
+- Критик-гейт A-F вслух с цитатами вместо свободного self-check
+- Три сквозных закона (внешняя сверка, вес знания, поиск AI-рычага) на все семь тактов
+- Золотые файлы проекта (`PROJECT.md` / `MARKET.md` / `TRACK.md`) вместо разрозненных
+  артефактов без единого паспорта
 
 ---
 
 ## Files to copy
 
-Источник — `_agent-packs/alex-marketer/`, цель — `office/agents/alex-marketer/`. Копируется рекурсивно.
+Источник — `_agent-packs/marketer/`, цель — **одна папка `office/agents/marketer/`**.
+
+**Модель установки: пак ложится зеркалом.** Весь пак копируется в `office/agents/marketer/`
+офиса ученика с той же структурой, что у нас. Скиллы **остаются внутри агента**
+(`office/agents/marketer/skills/`) и в `.claude/skills/` НЕ копируются и не регистрируются:
+весь текст агента (таблица роутинга, семь тактов, ссылки на `knowledge/`, `templates/`,
+`scripts/`) адресует их путями от своей папки. Разложи скиллы по `.claude/skills/` — и вся
+таблица роутинга у ученика укажет в пустоту.
+
+В `.claude/` попадает ровно один файл — обёртка субагента `.claude/agents/marketer.md`,
+и её генерирует `scripts/build-wrapper.sh`, а не копирование.
 
 ```yaml
 files:
   - src: core.md
-    dest: office/agents/alex-marketer/core.md
+    dest: office/agents/marketer/core.md
   - src: soul.md
-    dest: office/agents/alex-marketer/soul.md
+    dest: office/agents/marketer/soul.md
   - src: CLAUDE.md
-    dest: office/agents/alex-marketer/CLAUDE.md
+    dest: office/agents/marketer/CLAUDE.md
   - src: overrides.md
-    dest: office/agents/alex-marketer/overrides.md
-    preserve_if_exists: true
+    dest: office/agents/marketer/overrides.md
+    preserve_if_exists: true   # не затирать если пользователь уже правил
   - src: memory.md
-    dest: office/agents/alex-marketer/memory.md
-    preserve_if_exists: true   # сохраняем рабочие записи клиента
-  - src: failures.md
-    dest: office/agents/alex-marketer/failures.md
-    preserve_if_exists: true   # сохраняем рабочие записи клиента
-  - src: agent-state.md
-    dest: office/agents/alex-marketer/agent-state.md
-    preserve_if_exists: true   # сохраняем активную задачу клиента
-  - src: knowledge/
-    dest: office/agents/alex-marketer/knowledge/
-    recursive: true
-  - src: skills/
-    dest: .claude/skills/
-    recursive: true
-
-# Templates копируются в папку агента — используются при первом запуске
-templates:
-  - src: templates/customers.template.md
-    dest: office/agents/alex-marketer/templates/customers.template.md
-  - src: templates/hypotheses.template.md
-    dest: office/agents/alex-marketer/templates/hypotheses.template.md
-
-# Шаблон папки распаковки — используется в /alex-onboarding Шаг 3.1
-# (Алекс копирует _template-audience/ в projects/<slug>/ при выборе направления)
-project_templates:
-  - src: ../../projects/_template-audience/
-    dest: projects/_template-audience/
-    recursive: true
+    dest: office/agents/marketer/memory.md
     preserve_if_exists: true
-    description: |
-      Шаблон папки проекта — копируется Алексом в `projects/<slug>/`
-      при онбординге, когда клиент выбирает направление.
-      Содержит: audience/, audience/segments/, inbox/, hypotheses.md и т.д.
+  - src: failures.md
+    dest: office/agents/marketer/failures.md
+    preserve_if_exists: true
+  - src: wins.md
+    dest: office/agents/marketer/wins.md
+    preserve_if_exists: true
+  - src: agent-state-template.md
+    dest: office/agents/marketer/agent-state-template.md
+  - src: knowledge/
+    dest: office/agents/marketer/knowledge/
+  - src: skills/
+    dest: office/agents/marketer/skills/   # НЕ в .claude/skills/ — см. модель установки выше
+  - src: templates/
+    dest: office/agents/marketer/templates/
+  - src: scripts/
+    dest: office/agents/marketer/scripts/
 
-# Опциональное расширение (модуль встреч) — не копируется автоматически,
-# активируется отдельной командой /marketer-enable-meetings
-extensions:
-  - id: sales-meetings
-    src: extensions/sales-meetings/
-    dest: office/agents/alex-marketer/extensions/sales-meetings/
-    auto_install: false
-    activated_by: /marketer-enable-meetings
+# agent-state.md (состояние активного проекта) НЕ входит в пакет — заводится из
+# agent-state-template.md первым действием при первом обращении к агенту.
+```
+
+После копирования — сгенерируй обёртку субагента (нужен `Bash`):
+
+```bash
+bash office/agents/marketer/scripts/build-wrapper.sh
+```
+
+Скрипт кладёт `.claude/agents/marketer.md` — frontmatter (имя, описание с триггерами,
+`tools`, модель) плюс полное тело `core.md` и якорь «моя папка — `office/agents/marketer/`».
+Гонять после **каждой** правки `core.md`: обёртка сама изменения не подхватывает.
+
+Старые имена команд, которые ученики знают по прошлым версиям (`jtbd`, `alex-onboarding`,
+`marketer-funnel` и прочие), отдельно регистрировать **не нужно** — карта алиасов лежит
+в `office/agents/marketer/CLAUDE.md`, и агент разводит их по своим скиллам сам.
+
+---
+
+## Updates to `office/AGENTS.md`
+
+Вставить строку в таблицу «Установленные агенты» (после последней существующей строки):
+
+```markdown
+| **Маркетолог (Алекс)** | Находит точку приложения усилий, где деньги жирные именно для этого бизнеса, и доводит её до цифры. Семь тактов от физики бизнеса до гипотезы с критерием. Сам идёт в мир за фактурой — не анкета, а догадка на подтверждение. | *«с чего начать», «где у меня деньги», «распакуй ЦА», «упакуй оффер», «оцени оффер», «конкуренты», «какие воронки в моей нише»* |
 ```
 
 ---
 
-## Migration from v1.x (audience-pipeline) → v2.0 (JTBD)
+## Updates to root `CLAUDE.md`
 
-Если у клиента уже стоит предыдущая версия Алекса с audience-pipeline скиллами:
+**НЕТ.** Корневой CLAUDE.md при установке НЕ редактируется (inline-модель @include упразднена). Агент подключается карточкой в `office/map-team.md` — см. блок «Карточка для карты команды» ниже.
 
-```yaml
-remove_skills:
-  - .claude/skills/audience-stage
-  - .claude/skills/audience-quick-capture
-  - .claude/skills/audience-internet-research
-  - .claude/skills/audience-validation
-  - .claude/skills/audience-awareness-lite
-  - .claude/skills/audience-resume
-  - .claude/skills/audience-status
-  - .claude/skills/audience-deliverable
-  - .claude/skills/audience-check
-  - .claude/skills/competitors-research
-  - .claude/skills/marketer-revision
-  - .claude/skills/marketer-checkin
-  - .claude/skills/revise-segment
-  - .claude/skills/unpack-product
-  - .claude/skills/unpack-funnel
-  - .claude/skills/product-build
-  - .claude/skills/product-add
-  - .claude/skills/funnel-build
+---
 
-remove_knowledge:
-  - office/agents/alex-marketer/knowledge/audience-framework.md
-  - office/agents/alex-marketer/knowledge/classics-compact.md
-  - office/agents/alex-marketer/knowledge/hormozi-offer-market.md
-  - office/agents/alex-marketer/knowledge/schwartz-awareness.md
-  - office/agents/alex-marketer/knowledge/stage-lock.md
-  - office/agents/alex-marketer/knowledge/pipeline-requirements.md
-  - office/agents/alex-marketer/knowledge/voc-quality-rules.md  # если был установлен фикс apr-2026
+## Updates to `office/agents/director/core.md`
 
-# Сохраняем у клиента (preserve):
-preserve:
-  - office/agents/alex-marketer/memory.md
-  - office/agents/alex-marketer/failures.md
-  - office/agents/alex-marketer/agent-state.md
-  - office/agents/alex-marketer/overrides.md
-  - projects/<slug>/  # ВСЕ рабочие папки клиентских проектов
+**1. В секцию «Команда офиса»** (список «Типовые роли») — добавить строку:
+
+```markdown
+- **Маркетолог (Алекс)** — находит точку приложения усилий, где деньги жирные именно для этого бизнеса: физика бизнеса, деньги от прибыли назад, сегменты, конкуренты, оффер, воронка, гипотеза с критерием. Сам идёт в мир за фактурой вместо анкеты — первое обращение начинается с догадки на подтверждение, не с вопросника
+```
+
+**2. В секцию «Роутинг»** — добавить строку в «Базовое правило маршрутизации»:
+
+```markdown
+- "с чего начать / где у меня деньги / распакуй ЦА / упакуй оффер / оцени оффер / конкуренты / какие воронки в моей нише" → **Маркетолог** (см. секцию "Маркетолог-триггер" ниже)
+```
+
+**3. Добавить секцию «Маркетолог-триггер»** (вставлять ПЕРЕД секцией «Output contract», если она отсутствует):
+
+```markdown
+## Маркетолог-триггер
+
+Когда пользователь просит разобрать маркетинг, ЦА, оффер, конкурентов, воронку или
+не понимает, с чего начинать бизнес/проект — **не бросайся сам**.
+
+Действия:
+
+1. **Первый контакт — не блокер.** Маркетолог сам ведёт вход без анкеты: читает то, что
+   видно снаружи, и возвращается с догадкой на подтверждение. Просто передай задачу.
+2. **Передай задачу Маркетологу** с контекстом:
+   ```
+   to: Marketer
+   task: [что просит владелец — разбор/сегменты/оффер/воронка/конкуренты]
+   context: [проект, известные цифры, если есть]
+   project_root: office/agents/marketer/agent-state.md → project_root (если проект уже заведён)
+   output: диагноз/развилка/отдача с самооценкой A-F и вынесенным выбором владельцу
+   ```
+3. **Не переписывай сам.** Твоя задача — классифицировать и передать. Маркетолог сам ведёт
+   маршрут по семи тактам, начиная с того рубежа, где проект остановился в прошлый раз.
 ```
 
 ---
 
-## Updates to existing files
+## Updates to `office/agents/director/knowledge/routing-patterns.md`
+
+**1. В таблицу «Core-роутинг»** — добавить строки:
+
+```markdown
+| "с чего начать / где у меня деньги / распакуй ЦА / упакуй оффер / конкуренты / какие воронки в моей нише" | **Маркетолог** | см. секцию "Маркетолог-триггер" в `core.md` — первый контакт без анкеты, догадка на подтверждение |
+| "оцени оффер / разбери буллиты / докрути оффер" | **Маркетолог** → `offer-lab` | оценка готового оффера доступна в любой момент, даже без закрытых тактов |
+```
+
+**2. В «Правила»** — добавить пункт:
+
+```markdown
+- **Первый контакт — не анкета.** Маркетолог сам читает то, что видно снаружи (сайт, канал,
+  нишу), и приходит с догадкой о бизнесе на подтверждение владельца — не с вопросником.
+```
+
+**3. В «Параллельный / последовательный режим»** — добавить связки:
+
+```markdown
+- **Маркетолог → Copywriter** — сегменты и оффер передаются на тексты
+- **Маркетолог → Designer** — путь клиента и конкурентная карта передаются на визуал/лендинг
+```
+
+---
+
+## First-task suggestion
 
 ```yaml
-updates:
-  - file: CLAUDE.md
-    section: "## Обязательный layered include при старте"
-    add_line: "@office/agents/alex-marketer/core.md"
-
-  - file: office/AGENTS.md
-    section: "## Активная команда"
-    add_row: |
-      | **Алекс Маркетолог** | Маркетолог-Хормози: распаковка ЦА через JTBD (13 шагов × N сегментов), оффер, воронка | *«привет алекс», «распакуй ЦА», «JTBD», «провёл диагностику»* |
-
-  - file: office/agents/director/core.md
-    section: "## Роутинг"
-    add_rows: |
-      | онбординг алекс, привет алекс, зашёл алекс, давай алекс, познакомимся, алекс представься | **Алекс** → `/alex-onboarding` (точка входа — 6 тактов первого контакта) |
-      | распакуй ЦА, найди сегменты, кто наша ЦА, на кого работаем, JTBD, jobs to be done, big job, jobstory клиента | **Алекс** → `/jtbd` *(если онбординг не пройден — авто-route на `/alex-onboarding`)* |
-      | проверь JTBD, аудит JTBD, свежий взгляд, критик JTBD | **Алекс** → `/jtbd-critic` *(в новом чате, чистый контекст)* |
-      | провёл диагностику, был созвон, клиент оплатил, клиент отказался, вот транскрипт | **Алекс** → `/marketer-log-deal` *(требует активации модуля встреч)* |
+first_task:
+  suggestion: "С чего начать разбор моего бизнеса?"
+  why: "Маркетолог сам сходит посмотреть сайт/канал и вернётся с догадкой о бизнесе на подтверждение — первый разбор будет через пару минут, не после анкеты из 20 вопросов."
+  skill: null   # онбординг вшит в core (skills/onboard), отдельно вызывать не нужно
 ```
+
+---
+
+## Требования (опционально)
+
+Маркетолог работает «из коробки» на WebSearch/WebFetch и своих знаниях — этого достаточно
+для всех 11 скиллов. Один скилл (`niche-scan`, разведка воронок практиков по видео) умеет
+дополнительно тянуть субтитры YouTube через `yt-dlp`:
+
+```bash
+brew install yt-dlp
+```
+
+Без него `niche-scan` просто пропускает видео-источники и работает по статьям и блогам —
+качество разведки не ломается, часть источников уже недоступна.
 
 ---
 
 ## Post-install message to client
 
 ```
-✅ Алекс в команде.
+✅ Маркетолог (Алекс) в команде. Можно сразу разбирать проект.
 
-Когда захочешь начать — напиши **«привет алекс»** или **«онбординг алекс»**.
-Я открою твой офис, посмотрю что у тебя живое, и вернусь с диагнозом
-и одним острым вопросом — про точку приложения усилий, где деньги жирные
-именно для тебя.
+Скажи «с чего начать» или расскажи в двух словах, чем занимаешься — он сам сходит
+посмотрит сайт/канал/нишу и вернётся с догадкой о бизнесе: «вот что я понял — поправь,
+где не прав». Спросит только то, чего снаружи не достать: сколько хочешь чистыми,
+какая маржа, что происходит внутри.
 
-Никаких анкет, никаких длинных опросников. Просто живой разговор.
+Дальше — пиши что нужно:
+- **«с чего начать»** — первый разбор проекта без анкеты
+- **«где у меня деньги»** — обратная воронка от прибыли, сколько нужно лидов
+- **«распакуй ЦА»** — сегменты, кто реально платит и за что
+- **«конкуренты»** — с чем сравнивают, где свободное место
+- **«упакуй оффер»** — центральная фраза + продуктовая лестница
+- **«оцени оффер»** — жирность готового оффера и буллитов по 14 критериям
+- **«какие воронки в моей нише»** — разведка практиков со ссылками на источники
+- **«кастдев без клиентов»** — синтетические интервью, если живых клиентов ещё нет
 
-—
-
-Что я делаю дальше (если интересно прочитать на ходу):
-
-• Распаковываю твою целевую аудиторию — кто реально твой клиент,
-  что у него болит, что он хочет на самом деле, через что покупает,
-  что мешает купить. Работаю на твоих кейсах и фактуре, не на
-  парсинге интернета.
-
-• На выходе — один документ-карта по сегментам, готовый материал
-  для оффера, лендинга, постов и работы с возражениями.
-
-• Потом проверяю свежим взглядом в отдельной сессии — выловлю
-  абстракции, противоречия, недосказанное.
-
-—
-
-Если есть продающие/диагностические созвоны: скажи «активируй встречи» —
-добавлю в офис карточки клиентов и банк возражений из транскриптов.
-
-Поехали — напиши «привет алекс».
+После каждого разбора Маркетолог печатает вслух самооценку A-F с цитатами из своего же
+текста и выносит развилку тебе — сам за тебя не решает.
 ```
+
+---
+
+## Manual install (если в офисе нет команды `/install-agent`)
+
+Если ты не используешь `client-office-template` или скилл `/install-agent` не установлен — пакет можно поставить руками. Терминал, из корня твоего AI-офиса:
+
+```bash
+# 1. Убедись что пак лежит в _agent-packs/marketer (скопируй из своего
+#    источника дистрибуции паков, если его там ещё нет)
+
+# 2. Создать папки агента (всё живёт в одной папке, скиллы — внутри неё)
+mkdir -p office/agents/marketer/knowledge
+mkdir -p office/agents/marketer/templates
+mkdir -p office/agents/marketer/scripts
+mkdir -p office/agents/marketer/skills
+
+# 3. Скопировать файлы агента
+cp _agent-packs/marketer/CLAUDE.md                 office/agents/marketer/CLAUDE.md
+cp _agent-packs/marketer/core.md                   office/agents/marketer/core.md
+cp _agent-packs/marketer/soul.md                   office/agents/marketer/soul.md
+cp _agent-packs/marketer/agent-state-template.md   office/agents/marketer/agent-state-template.md
+cp -R _agent-packs/marketer/knowledge/*  office/agents/marketer/knowledge/
+cp -R _agent-packs/marketer/templates/*  office/agents/marketer/templates/
+cp -R _agent-packs/marketer/scripts/*    office/agents/marketer/scripts/
+
+# 4. Шаблоны памяти — копировать только если их ещё нет
+for f in memory failures wins overrides; do
+  [ -f "office/agents/marketer/$f.md" ] || \
+    cp "_agent-packs/marketer/$f.md" "office/agents/marketer/$f.md"
+done
+
+# 5. Скиллы — ВНУТРЬ папки агента, не в .claude/skills/
+#    (весь текст агента адресует их путями от своей папки)
+cp -R _agent-packs/marketer/skills/* office/agents/marketer/skills/
+
+# 6. Сгенерировать обёртку субагента → .claude/agents/marketer.md
+bash office/agents/marketer/scripts/build-wrapper.sh
+```
+
+Проверка, что установка легла верно (обе команды должны что-то вывести):
+
+```bash
+ls office/agents/marketer/skills/     # 11 папок скиллов
+ls .claude/agents/marketer.md         # обёртка субагента
+```
+
+После копирования — добавь в `office/AGENTS.md` руками строку про Маркетолога
+(см. секцию `Updates to office/AGENTS.md` выше) и в `office/map-team.md`
+карточку (см. секцию ниже).
+
+После — просто скажи «с чего начать»: Маркетолог сам сходит посмотреть проект и
+вернётся с догадкой на подтверждение. Дальше пиши.
+
+---
+
+## Uninstall (future)
+
+Для будущей поддержки `/uninstall-agent marketer`. Реверс установки:
+
+```yaml
+uninstall:
+  remove_folders:
+    - office/agents/marketer/    # вместе со скиллами: они живут внутри агента
+  remove_files:
+    - .claude/agents/marketer.md   # сгенерированная обёртка — единственный след в .claude/
+  # remove_skill_folders: НЕТ. Скиллы в .claude/skills/ не ставятся (см. модель установки),
+  # сносить там нечего. Есть папки вроде .claude/skills/jtbd/ — это остатки старой установки
+  # версии 1.x, снести их можно, но проверь глазами: там могли остаться правки ученика.
+  remove_lines_from:
+    - path: office/AGENTS.md
+      match: "**Маркетолог (Алекс)**"
+    - path: office/map-team.md
+      match: "**Маркетолог**"
+    - path: office/agents/director/core.md
+      match: "**Маркетолог (Алекс)** — находит точку"
+    - path: office/agents/director/core.md
+      section: "## Маркетолог-триггер"   # удалить секцию целиком
+    - path: office/agents/director/knowledge/routing-patterns.md
+      match: "Маркетолог"
+  preserve:
+    - projects/   # артефакты проекта владельца (PROJECT.md/MARKET.md/customers.md и т.д.), не трогать
+```
+
+## Карточка для карты команды (office/map-team.md)
+
+Скилл /install-agent добавляет этот блок карточкой в `office/map-team.md` (integration_model: card, дефолт):
+
+- **Маркетолог (Алекс)** — находит точку приложения усилий, где деньги жирные именно для
+  этого бизнеса, и доводит её до цифры. Сам идёт в мир за фактурой вместо анкеты.
+  TRIGGERS: «с чего начать» · «где у меня деньги» · «распакуй ЦА» · «упакуй оффер» ·
+  «оцени оффер» · «конкуренты» · «какие воронки в моей нише».
+  Файл: `office/agents/marketer/core.md`.

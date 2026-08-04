@@ -1,344 +1,114 @@
-# Алекс Маркетолог — пак для AI-офиса
+# Маркетолог (Алекс)
 
-Маркетолог-партнёр для твоего AI-офиса. Распаковывает целевую аудиторию через **JTBD-фрейм** (Jobs To Be Done), собирает Grand Slam Offer по Хормози, строит воронку. Голос живой, без AI-слопа. Не консультант со списком советов — **штурмит вместе**.
+Маркетолог-навигатор. Не консультант со списком советов и не интервьюер с опросником —
+находит у бизнеса **точку приложения усилий, где деньги жирные именно для него**, и
+доводит её до цифры. Сам идёт в мир за фактурой (сайт, канал, ниша, конкуренты), а не
+ждёт, пока владелец заполнит анкету: приходит с догадкой «вот что я понял — поправь, где
+не прав», а не с вопросником.
 
-## Зачем JTBD (а не классический портрет ЦА)
+Ведёт проект через семь тактов: физика и точка → деньги назад (обратная воронка от
+прибыли, предельный CPL) → спрос и сегменты → голос рынка → конкуренты и свободное место
+→ обещание и продуктовая лестница → путь клиента с узким местом → гипотеза с критерием.
+Три сквозных закона: не выдумывай (внешняя сверка с источником), помечай вес каждого
+утверждения (🟢 факт / 🟡 гипотеза / 🔴 синтетика / ⚪ белое пятно), ищи AI-рычаг с эффектом
+и сроком замера. Каждый ответ проходит критик-гейт A-F вслух с цитатами, порог отдачи ≥ B.
 
-Классическая сегментация работает с **демографией** (возраст, доход, профессия). JTBD работает с **причиной покупки** — какую работу клиент нанимает твой продукт сделать. Для **инфо-продуктов, услуг, экспертных программ, B2B** это даёт лендинг и оффер которые попадают в реальный мотив, а не в усреднённый портрет «успешный предприниматель 30-45 лет». Цитата клиента «у меня в голове каша» — точнее любой персоны.
+## Что умеет — 11 скиллов
 
-**JTBD не оптимален** для импульсных и неосознанных покупок (еда, одежда, FMCG) — там работает классический подход с эмоцией и атрибутами. Для всего остального — JTBD точнее.
+| Скилл | Что делает |
+|---|---|
+| `onboard` | Первый контакт с новым проектом: вместо анкеты — разведка сайта/канала/ниши, догадка о бизнесе на подтверждение владельцу, заводит папку проекта и три золотых файла |
+| `mkt-recon` | Вход и деньги назад: физика бизнеса + обратная воронка от прибыли — сколько нужно сделок, лидов, денег, сходится ли экономика |
+| `jtbd` | Спрос: отбор сегментов, распаковка каждого (боли/хотелки/страхи/возражения), зрелость спроса, язык аудитории |
+| `voice-of-market` | Голос рынка: готовит и разбирает живое интервью в дословный банк формулировок, заводит карточку покупателя после созвона |
+| `rivals` | Рынок: с чем реально сравнивают (не только прямые конкуренты), карта рынка, свободное место, угол отстройки |
+| `core-offer` | Обещание: центральная фраза продукта в трёх формах + продуктовая лестница (магнит → недорогой вход → основной → максимизатор) + цена |
+| `offer-lab` | Оценка и докрутка ГОТОВОГО оффера и буллитов по 14 критериям жирности, с цитатой на каждый флаг |
+| `niche-scan` | Разведка ниши: как в ней вообще устроен маркетинг, воронки и механики практиков — только со ссылкой на источник и дату |
+| `synthetic-custdev` | Кастдев без живых клиентов: пять синтетических персон, глубинные интервью, синтез в гипотезы — честно помечено 🔴 |
+| `funnel` | Путь клиента: карта воронки по шагам-действиям, метрика на каждый переход, одно узкое место по Голдратту |
+| `growth-lab` | Гипотезы: превращает наблюдение в гипотезу с критерием и датой, единственное место полной проработки AI-рычага, еженедельный прогон |
 
-**Версия:** v2.1 (JTBD + Core Offer + CustDev)
-**Что нового в v2.1:**
-- 🔴 **Фикс зависимостей** — добавлен `/custdev` (был упомянут как обязательный, но физически отсутствовал)
-- 🆕 **`/core-offer` v0.2** — упаковка центральной фразы продукта в трёх формах (Stage 0-7)
-- 🆕 **Система апдейтов** — `manifest.yaml` + `scripts/update-pack.sh` для обновления одной командой
-- 🆕 **Verify перед публикацией** — `scripts/verify-pack.sh` ловит битые ссылки на скиллы
+Скиллы — бандл **внутри папки агента**, отдельными командами офиса они не регистрируются.
+Агент вызывает их сам, читая нужный файл по ходу работы; тебе руками запускать нечего.
 
-**Что было в v2.0:** переход с audience-pipeline (Internet-First) на JTBD (13 шагов на сегмент × 1-5 сегментов), скилл-критик `/jtbd-critic` (свежий взгляд в новом чате).
+## Как поставить
 
-📚 Полный лог изменений → [CHANGELOG.md](CHANGELOG.md). Архитектура v2.1 → [SPEC-v2.1.md](SPEC-v2.1.md).
-
----
-
-## Что внутри
+Пак ложится **зеркалом в одну папку**: скопируй `_agent-packs/marketer/` целиком в
+`office/agents/marketer/` своего офиса. Детали и ручная установка (если нет команды
+`/install-agent`) — в `install.md`.
 
 ```
-alex-marketer/
-├── manifest.yaml        ← 🆕 декларация зависимостей (что в паке, версия)
-├── CHANGELOG.md         ← 🆕 история версий
-├── core.md              ← главная логика (читается при каждой сессии)
-├── soul.md              ← характер
-├── CLAUDE.md            ← layered-include точка
-├── install.md           ← машиночитаемый манифест установки
-├── memory.md            ← пустой шаблон (Алекс наполнит сам)
-├── failures.md          ← пустой шаблон
-├── overrides.md         ← пустой (для твоих кастомных правил поверх)
-│
-├── scripts/             ← 🆕 утилиты пака
-│   ├── verify-pack.sh   ← проверка целостности (для мейнтейнера, перед публикацией)
-│   └── update-pack.sh   ← обновление пака у ученика
-│
-├── .claude/
-│   └── skills/          ← 🆕 глобальные slash-команды для всего workspace
-│       └── custdev/     ← синтетический CustDev (обязательный путь при 0 платящих)
-│
-├── knowledge/           ← база знаний
-│   ├── voice.md         ← как говорить с клиентом
-│   ├── first-contact-protocol.md  ← 6 тактов первого контакта
-│   ├── state-management.md
-│   ├── hypothesis-system.md
-│   ├── file-ownership.md
-│   └── jtbd/            ← JTBD-методология (полная)
-│       ├── methodology-core.md
-│       ├── jtbd-handbook.md
-│       ├── value-mechanics.md
-│       ├── etalon-jobstories.md
-│       ├── jtbd-interview-guide.md
-│       ├── jtbd-extras.md
-│       └── jtbd-handbook-chapters.md
-│
-├── skills/              ← 5 локальных скиллов Алекса
-│   ├── alex-onboarding/ ← точка входа, 6 тактов первого контакта
-│   ├── jtbd/            ← главный пайплайн, 13 шагов на сегмент
-│   ├── jtbd-critic/     ← критик в новом чате (5 шагов проверки)
-│   ├── core-offer/      ← 🆕 упаковка центральной фразы (Stage 0-7)
-│   └── marketer-log-deal/ ← запись клиентских встреч (опционально)
-│
-├── extensions/
-│   └── sales-meetings/  ← модуль клиентских встреч (активируется отдельно)
-│
-└── templates/
-    ├── customers.template.md
-    └── hypotheses.template.md
+office/agents/marketer/
+├── core.md, soul.md, CLAUDE.md, overrides.md
+├── memory.md, failures.md, wins.md   (уже с затравкой — не пустые)
+├── knowledge/   (15 файлов + INDEX.md)
+├── templates/   (золотые файлы проекта)
+├── scripts/     (build-wrapper.sh, yt-transcript.sh, pack-check.sh)
+└── skills/      (11 папок — скиллы живут ЗДЕСЬ, не в .claude/skills/)
 ```
 
----
+**Скиллы в `.claude/skills/` не копируются.** Весь текст агента адресует их путями от своей
+папки — разложишь по `.claude/skills/`, и вся его таблица роутинга укажет в пустоту.
 
-## 🔄 Обновление пака с v2.0 → v2.1
-
-Если у тебя уже установлена v2.0:
+Единственное, что попадает в `.claude/`, — обёртка субагента, и её генерирует скрипт:
 
 ```bash
-# Из корня папки где установлен alex-marketer/
-curl -fsSL https://raw.githubusercontent.com/rusanovproject-dotcom/alex-marketer-pack/main/scripts/update-pack.sh -o /tmp/update-pack.sh
-bash /tmp/update-pack.sh /path/to/your/office/agents/alex-marketer
+bash office/agents/marketer/scripts/build-wrapper.sh   # → .claude/agents/marketer.md
 ```
 
-Скрипт:
-- ✅ Скачает свежий пак, сравнит с твоим (по `manifest.yaml`)
-- ✅ Покажет diff — что изменится
-- ✅ Сделает бэкап старой версии в `.alex-pack-backups/`
-- ✅ Применит апдейт **сохранив твои файлы**: `overrides.md`, `agent-state.md`, `memory.md`, `failures.md`, `projects/`, `customers/`, `inbox/`
-- ✅ Скопирует `.claude/skills/custdev/` в `.claude/skills/` твоего workspace
-- ✅ Прогонит `verify-pack.sh` локально для проверки
+Гоняй после каждой правки `core.md` — обёртка не подхватывает изменения сама.
 
-**Если ты правил `core.md` руками** — скрипт это заметит и спросит подтверждение перед перезаписью. Безопаснее — перенести правки в `overrides.md` заранее.
+## Если у тебя уже стоял Алекс прежней версии
 
----
+Прежняя версия ставилась в папку `office/agents/alex-marketer/` — под другим именем. Новая
+ложится в `office/agents/marketer/`, поэтому просто поставить её поверх недостаточно: в офисе
+окажутся **два маркетолога**, оба откликаются на «алекс» и «маркетолог», и звать будет то
+одного, то другого.
 
-## Установка с нуля (если в офисе нет маркетолога)
+Папку прежнего **не удаляй** — в `memory.md` и `overrides.md` лежат твои наработки. Нужно
+только вывести его из роутинга и забрать нажитое:
 
-1. **Клонировать пак рядом с офисом:**
+```bash
+# 1. убрать прежнего из команды (файл-обёртка — это и есть роутинг)
+rm -f .claude/agents/alex-marketer.md
 
-   ```bash
-   cd ~/path/to/your-office
-   git clone https://github.com/<owner>/<repo>.git _temp/alex-marketer-pack
-   ```
+# 2. забрать наработки в нового
+cat office/agents/alex-marketer/memory.md   >> office/agents/marketer/memory.md
+cat office/agents/alex-marketer/failures.md >> office/agents/marketer/failures.md
 
-2. **Скопировать пак в офис:**
-
-   ```bash
-   cp -R _temp/alex-marketer-pack/. _agent-packs/alex-marketer/
-   rm -rf _temp/alex-marketer-pack
-   ```
-
-3. **В Claude Code запустить установщик:**
-
-   ```
-   /install-agent alex-marketer
-   ```
-
-   Если такого скилла нет — установить вручную:
-
-   ```bash
-   # Папка агента
-   mkdir -p office/agents/alex-marketer
-   cp -R _agent-packs/alex-marketer/{core.md,soul.md,CLAUDE.md,knowledge,templates,extensions} \
-         office/agents/alex-marketer/
-
-   # Пустые рабочие файлы (Алекс сам наполнит)
-   cp _agent-packs/alex-marketer/{memory.md,failures.md,overrides.md} office/agents/alex-marketer/
-   touch office/agents/alex-marketer/agent-state.md
-
-   # Скиллы — в Claude Code skills
-   cp -R _agent-packs/alex-marketer/skills/. .claude/skills/
-   ```
-
-4. **Подключить в `CLAUDE.md` офиса:**
-
-   В корневой `CLAUDE.md` добавить строку:
-   ```
-   @office/agents/alex-marketer/core.md
-   ```
-
-5. **Готово — позови Алекса:**
-
-   ```
-   привет алекс
-   ```
-
-   Он откроет офис, прочитает что есть, даст диагноз и спросит про направление.
-
----
-
-## Миграция со старой версии (audience-pipeline → JTBD)
-
-Если у тебя уже стоит предыдущая Алекс с audience-pipeline (`/audience-stage`, `/audience-internet-research` и т.д.):
-
-### Что ты потеряешь
-- Старые скиллы audience-pipeline (audience-stage, internet-research, validation, awareness-lite, resume, status, deliverable, check, competitors-research, marketer-revision, marketer-checkin, revise-segment, unpack-product, unpack-funnel, product-build, product-add, funnel-build)
-- Knowledge: audience-framework, schwartz-awareness, classics-compact, pipeline-requirements, stage-lock, hormozi-offer-market
-
-### Что сохранится
-- Твоя `memory.md` — все рабочие записи Алекса
-- Твоя `failures.md` — записи ошибок
-- Твоя `agent-state.md` — активная задача
-- Твой `overrides.md` — кастомные правила
-- **Все папки проектов** (`projects/<slug>/`) — там твоя работа, ничего не трогаем
-
-### Шаги миграции
-
-1. **Сделай бэкап на всякий случай:**
-
-   ```bash
-   cd ~/path/to/your-office
-   cp -R office/agents/alex-marketer ~/.alex-backup-$(date +%Y%m%d)
-   cp -R .claude/skills ~/.claude-skills-backup-$(date +%Y%m%d)
-   ```
-
-2. **Удали старые скиллы и knowledge:**
-
-   ```bash
-   # Старые скиллы
-   rm -rf .claude/skills/{audience-stage,audience-quick-capture,audience-internet-research,audience-validation,audience-awareness-lite,audience-resume,audience-status,audience-deliverable,audience-check}
-   rm -rf .claude/skills/{competitors-research,marketer-revision,marketer-checkin,revise-segment}
-   rm -rf .claude/skills/{unpack-product,unpack-funnel,product-build,product-add,funnel-build}
-
-   # Старые knowledge
-   rm -f office/agents/alex-marketer/knowledge/{audience-framework,classics-compact,hormozi-offer-market,schwartz-awareness,stage-lock,pipeline-requirements,voc-quality-rules}.md
-   ```
-
-3. **Скачай новый пак и положи рядом с офисом:**
-
-   ```bash
-   git clone https://github.com/<owner>/<repo>.git _temp/alex-pack
-   ```
-
-4. **Перезапиши пак (СОХРАНЯЯ memory/failures/agent-state/overrides):**
-
-   ```bash
-   # Безопасно перезаписываем — install.md явно помечает preserve_if_exists для рабочих файлов
-   cp _temp/alex-pack/{core.md,soul.md,CLAUDE.md,install.md,README.md} _agent-packs/alex-marketer/
-   cp -R _temp/alex-pack/knowledge/. _agent-packs/alex-marketer/knowledge/
-   cp -R _temp/alex-pack/skills/. _agent-packs/alex-marketer/skills/
-   cp -R _temp/alex-pack/extensions/. _agent-packs/alex-marketer/extensions/
-   cp -R _temp/alex-pack/templates/. _agent-packs/alex-marketer/templates/
-
-   # Убираем временную папку
-   rm -rf _temp/alex-pack
-   ```
-
-5. **Установи новые файлы в офис (поверх старых, БЕЗ memory/failures/agent-state/overrides):**
-
-   ```bash
-   # Knowledge — полная замена
-   cp -R _agent-packs/alex-marketer/knowledge/. office/agents/alex-marketer/knowledge/
-
-   # Core — замена
-   cp _agent-packs/alex-marketer/core.md office/agents/alex-marketer/core.md
-   cp _agent-packs/alex-marketer/soul.md office/agents/alex-marketer/soul.md
-   cp _agent-packs/alex-marketer/CLAUDE.md office/agents/alex-marketer/CLAUDE.md
-
-   # Скиллы — установка новых
-   cp -R _agent-packs/alex-marketer/skills/jtbd .claude/skills/
-   cp -R _agent-packs/alex-marketer/skills/jtbd-critic .claude/skills/
-   cp _agent-packs/alex-marketer/skills/alex-onboarding/SKILL.md .claude/skills/alex-onboarding/SKILL.md
-   cp _agent-packs/alex-marketer/skills/marketer-log-deal/SKILL.md .claude/skills/marketer-log-deal/SKILL.md
-   ```
-
-6. **Проверь:**
-
-   ```bash
-   # должно быть 4 актуальных скилла
-   ls .claude/skills/ | grep -E "(alex-onboarding|jtbd|jtbd-critic|marketer-log-deal)"
-
-   # knowledge/jtbd/ существует
-   ls office/agents/alex-marketer/knowledge/jtbd/
-
-   # core.md содержит JTBD логику
-   grep -c "JTBD" office/agents/alex-marketer/core.md
-   ```
-
-7. **Запусти Алекса в Claude Code:**
-
-   ```
-   привет алекс
-   ```
-
-   Если он начинает работать через `/jtbd` — миграция прошла успешно. Если ругается на отсутствие старых файлов — `agent-state.md` или `overrides.md` могут содержать ссылки на удалённые скиллы. Очисти их или скажи Алексу «начни заново».
-
----
-
-## Что Алекс делает
-
-### Точка входа: онбординг (6 тактов, 5-10 минут)
-
-Алекс читает офис до первой реплики, потом:
-1. Тёплое включение — наблюдения о том что в офисе уже есть
-2. Объяснение роли — найти точку приложения усилий
-3. Физика бизнеса (5 типов клиента)
-4. Ревизия направлений
-5. Выбор одного направления → создание папки `projects/<slug>/`
-6. Запись `onboarding_completed: true` + переход в `/jtbd`
-
-### Главный пайплайн: JTBD-распаковка (13 шагов на сегмент)
-
-После онбординга — `/jtbd` ведёт через 13 шагов на каждый сегмент:
-
-```
-00. Диагностика и сбор фактуры
-01a. Factbase
-01b. Кластеризация сегментов (3-5)
-─── per-segment: ───
-02a. Extract & classify
-02b. Ask & check
-02c. Formulate Big Job
-03. JobStory generate
-04. JobStory check
-05. Точки А/Б
-06. Граф работ
-07a. Consideration set
-07b. Problems
-08. Барьеры
-09. Entry & Monetization Job
-10. Оценка сегмента
-─── общие: ───
-11. Ранжирование сегментов
-12. Механики ценности
-13. Стратегические гипотезы
+# 3. папку прежнего — в архив, чтобы не мешалась
+mkdir -p _archive && mv office/agents/alex-marketer _archive/alex-marketer-v2
 ```
 
-На выходе — единый документ `JTBD_анализ_<проект>.md` со всеми сегментами.
+Твои `overrides.md` (личные правила для агента) перенеси руками — просто перечитай прежний
+и допиши нужное в новый, слепо склеивать их нельзя. Дальше по офису: если имя «Алекс
+Маркетолог» упомянуто в `office/AGENTS.md` — поправь строку на нового.
 
-### Критик: `/jtbd-critic` (свежий взгляд в новом чате)
+Наработанные документы проекта (`customers.md`, `ICP.md`, `core-offer.md` и прочие) трогать
+не надо: они лежат в папке проекта, а не внутри агента, и новый подхватит их сам.
 
-Отдельная сессия, чистый контекст. 5 шагов:
-1. Флаги (5 типичных проблем)
-2. Связи (между шагами)
-3. Формат и единообразие
-4. Абстракции и факт-чек
-5. Аудит + 3 рекомендации
+## Первый запуск
 
-### Опционально: `/marketer-log-deal` (модуль встреч)
+Поставил — просто напиши ему что-нибудь про свой проект («с чего начать», «разбери мой
+бизнес», «у меня пока ничего нет»). Он сам поведёт: не будет заваливать анкетой, а сам
+прочитает то, что можно узнать снаружи (сайт, канал), и вернётся с догадкой на
+подтверждение. Спросит только то, чего снаружи не достать — деньги, планы, внутреннюю
+кухню.
 
-Активируется через `/marketer-enable-meetings`. Запись диагностических/продающих созвонов в карточки клиентов с цитатами, актуальностью оффера, банком возражений.
+## Требования
 
----
+Работает из коробки на своих знаниях и WebSearch/WebFetch. Один скилл (`niche-scan`,
+разведка воронок по видео) умеет тянуть субтитры YouTube через `yt-dlp` — без него скилл
+просто пропускает видео-источники и работает по статьям/блогам. Если нужно — один раз:
 
-## Команда
-
-Пак работает соло — не требует других агентов. Если в офисе есть Стратег / Дизайнер / Копирайтер — Алекс с ними координирует через файлы (`voice-of-customer.md`, `segment-core.md`).
-
----
-
-## Структура папки проекта (создаётся автоматически)
-
-При онбординге Алекс копирует `projects/_template-audience/` в `projects/<slug>/`:
-
-```
-projects/<slug>/
-├── CLAUDE.md          ← минимальный контекст проекта
-├── README.md
-├── _state/            ← внутренняя память Алекса по проекту
-├── _archive/
-├── audience/          ← JTBD-распаковка ЦА
-│   └── segments/      ← detail-файлы сегментов
-├── deliverable/       ← готовые артефакты для ментора
-├── inbox/             ← входящие материалы от клиента
-│   └── _new/
-├── hypotheses.md      ← реестр гипотез (макс 5 Active + 1 Key)
-└── learnings.md
+```bash
+brew install yt-dlp
 ```
 
----
+## Границы — чего НЕ делает
 
-## Помощь
-
-Если что-то не работает — позови Алекса в Claude Code и опиши проблему живой речью. Он скажет что упущено в установке.
-
-Если хочешь предложить улучшение пака — issue или PR в этот репозиторий.
-
----
-
-**Лицензия:** internal use only — пак для учеников AI-офисной программы.
+Тексты, посты, заголовки, авторский голос → Copywriter. Вёрстка и визуал лендинга →
+Designer. План запуска и координация исполнителей → Producer. КП и ведение конкретного
+человека до оплаты → Hermes. Финальный круг жирности уже прогнанного оффера (если такой
+агент есть в офисе) → Equalizer. Рекламный кабинет и семантика → Директолог.
