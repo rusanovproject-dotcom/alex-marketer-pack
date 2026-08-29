@@ -5,7 +5,8 @@
 Открой свой AI-офис в Claude Code или Codex и отправь ему:
 
 ```text
-Установи Маркетолога из https://github.com/rusanovproject-dotcom/alex-marketer-pack.
+Установи Маркетолога из ветки release/market-to-funnel-3.2 репозитория
+https://github.com/rusanovproject-dotcom/alex-marketer-pack.
 Сначала прочитай install.md и следуй ему. Не затирай существующие memory.md,
 failures.md, wins.md и overrides.md. После установки проверь pack-check.sh.
 ```
